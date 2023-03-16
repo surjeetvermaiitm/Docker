@@ -356,3 +356,200 @@ docker run [username]/[image name]
 ![1678216521934](image/README/1678216521934.png)
 
 ### Module-2 Managing data and working with Volumes
+
+Images are read only
+
+![1678284037346](image/README/1678284037346.png)
+
+![1678284164461](image/README/1678284164461.png)
+
+Volumes
+
+![1678285933836](image/README/1678285933836.png)
+
+Dockerfile
+
+```
+FROM node:14
+
+WORKDIR /app
+
+COPY package.json .
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 80
+
+#anonymous volume
+VOLUME ["/app/feedback"]
+
+# VOLUME [ "/app/node_modules" ]
+
+CMD [ "npm", "start" ]
+```
+
+Build the image (with anonymous volume)
+
+```
+docker build -t feedback-node:volumes .
+```
+
+Run the container
+
+```
+docker run -d -p 3000:80 --name feedback-app feedback-node:volumes
+```
+
+list all docker volume
+
+```
+docker volume ls
+```
+
+![1678286833829](image/README/1678286833829.png)
+Named volume
+can't be created using Dockerfile
+Build the container again after removing volume from Dockerfile
+
+```
+docker build -t feedback-node:volumes .
+```
+
+Run a container with named volume
+
+```
+docker run -d -p 3000:80 -- rm --name feedback-app -v [local folder]:[container folder] feedback-node:volumes
+docker run -d -p 3000:80 -- rm --name feedback-app -v feedback:/app/feedback feedback-node:volumes
+```
+
+removing anonymous created volume
+
+```
+docker volume rm VOL_NAME or docker volume prune
+```
+
+Bind mounts
+
+![1678287483858](image/README/1678287483858.png)
+
+Bind mount
+
+```
+docker run -d -p 3000:80  --name feedback-app -v feedback:/app/feedback {named volume} -v -v $(pwd):/app{bind mount} -v /app/node_modules {this is anonymous volume} feedback-node:volumes
+
+docker run -d -p 3000:80  --name feedback-app -v feedback:/app/feedback -v /"Users/surjeet/Documents/Sigmoid/k8/k8techworld/Dock8udemy/Docker/module-2/data-volumes-05-temporary-anonymous-volume):/app" -v /app/node_modules  feedback-node:volumes
+```
+
+![1678288282386](image/README/1678288282386.png)
+Note:
+named volume for writing data from container to local
+bind mount for overwriting or sharing data from local to container
+Use anonymous volume for overwriting the bind mount so that installed dependency doesn't get overwrite by bind mount inside container
+
+Note: Volume with longer path address has more precedence that's why in anonymous volume we use longer path like -v /app/node_modules
+
+Use nodemon for node app to restart by own when any changes made in node app code
+
+```
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "2.0.4"
+  }
+```
+
+```
+FROM node:14
+
+WORKDIR /app
+
+COPY package.json .
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 80
+
+# VOLUME [ "/app/node_modules" ]
+
+CMD [ "npm", "start" ]
+```
+
+![1678289374476](image/README/1678289374476.png)
+
+![1678289713275](image/README/1678289713275.png)
+
+Read only volumes
+By default mount volumes are read write
+Note : Bind mount volumes are not managed by Docker
+
+```
+docker run -d -p 3000:80  --name feedback-app -v feedback:/app/feedback -v absolute_path(/Users/surjeet/Documents/Sigmoid/k8/k8techworld/Dock8udemy/Docker/module-2/data-volumes-05-temporary-anonymous-volume):/app:ro -v /app/temp -v /app/node_modules {//this is anonymous volume}      feedback-node:volumes
+```
+
+Add .dockerignore file for ignoring unnecessary file
+
+Working with Env variables or .Env files
+
+![1678298947115](image/README/1678298947115.png)
+
+```
+FROM node:14
+
+WORKDIR /app
+
+COPY package.json .
+
+RUN npm install
+
+COPY . .
+
+ARG DEFAULT_PORT=80
+
+ENV PORT $DEFAULT_PORT
+
+EXPOSE $PORT
+
+# VOLUME [ "/app/node_modules" ]
+
+CMD [ "npm", "start" ]
+```
+
+```
+app.listen(process.env.PORT);
+```
+
+```
+docker run -d -p 3000:80  --env PORT=8000 --name feedback-app -v feedback:/app/feedback -v absolute_path(/Users/surjeet/Documents/Sigmoid/k8/k8techworld/Dock8udemy/Docker/module-2/data-volumes-05-temporary-anonymous-volume):/app:ro -v /app/temp -v /app/node_modules {//this is anonymous volume}      feedback-node:volumes
+```
+
+using .env file
+.env file
+
+```
+PORT=8000
+```
+
+```
+docker run -d -p 3000:80  --env-file ./.env --name feedback-app -v feedback:/app/feedback -v absolute_path(/Users/surjeet/Documents/Sigmoid/k8/k8techworld/Dock8udemy/Docker/module-2/data-volumes-05-temporary-anonymous-volume):/app:ro -v /app/temp -v /app/node_modules {//this is anonymous volume}      feedback-node:volumes
+```
+
+building same image with different port using build arg
+
+```
+docker build -t feedback-node:dev --build-arg DEFAULT_PORT=8000 .
+```
+
+![1678300305929](image/README/1678300305929.png)
+
+![1678300343975](image/README/1678300343975.png)
+
+### Module-3 Networks Cross container communication![1678635452836](image/README/1678635452836.png)
