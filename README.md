@@ -680,4 +680,78 @@ docker build -t goals-react .
 docker run --name goals-frontend --rm -d -it -p 3000:3000 goals-react
 ```
 
-##### Using Network
+##### Using common docker Network
+
+```
+docker create network goals-net
+docker run --name mongodb --rm -d --network goals-net mongo
+```
+
+backend
+
+replace localhost by container name
+
+```
+mongodb://[container name]:27017/db_name
+mongodb://mongodb:27017/db_name
+```
+
+we have to publish the port of backend because react run in browser which can be accessbile from localhost
+
+```
+docker run --name goals-backend --rm -d --network goals-net -p 80:80 goals node
+```
+
+Frontend
+
+replacing localhost by backend container name will not work as react run on browser, so we can not use network in react app. it can access api using localhost only, so we have to publish backend port
+
+```
+http://localhost/
+
+```
+
+```
+docker build -t goals-react .
+docker run --name goals-frontend --rm -d -it -p 3000:3000 goals-react
+```
+
+Adding Data persistence to mongodb
+
+```
+(named volume)
+docker run --name mongodb -v data:/data/db --rm -d --network goals-net mongo
+```
+
+using username and password in mongo
+
+![1679046747710](image/README/1679046747710.png)
+
+![1679046847401](image/README/1679046847401.png)
+
+![1679046915929](image/README/1679046915929.png)
+
+Volumes and Bind mounts to update live source code
+
+backend
+
+![1679047193554](image/README/1679047193554.png)
+
+use env variable in Dockerfile
+
+![1679047753488](image/README/1679047753488.png)
+
+```
+ENV MONGODB_USERNAME=root
+ENV MONGODB_PASSWORD=secret
+```
+
+![1679047839821](image/README/1679047839821.png)
+
+frontend
+
+![1679048361489](image/README/1679048361489.png)
+
+### Module-5 Docker-compose
+
+![1679050354545](image/README/1679050354545.png)
