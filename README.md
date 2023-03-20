@@ -553,3 +553,131 @@ docker build -t feedback-node:dev --build-arg DEFAULT_PORT=8000 .
 ![1678300343975](image/README/1678300343975.png)
 
 ### Module-3 Networks Cross container communication![1678635452836](image/README/1678635452836.png)
+
+1. container can communicate with www by default
+2. Container to Local-Host communication
+
+replace localhost to host.docker.internal
+
+```
+'mongodb://localhost:27017/db_name'
+to
+'mongodb://host.docker.internal:27017/db_name'
+```
+
+3. container to container communication
+
+```
+docker run mongo
+docker container inspect mongodb
+```
+
+take ip address of mongodb container from network setting
+and replace localhost by ip address
+
+```
+mongodb://ip_address:27017/db_name
+```
+
+![1679036570655](image/README/1679036570655.png)
+
+Container networks
+
+![1679036602452](image/README/1679036602452.png)
+
+```
+docker network create favorites-net
+
+docker run -d --name mongodb --network favorites-net mongo
+
+docker network ls
+```
+
+replace localhost by container name
+
+```
+mongodb://[container name]:27017/db_name
+mongodb://mongodb:27017/db_name
+```
+
+```
+docker run --name favorites --network favorites-net -d --rm -p 3000:3000 favorites-node
+```
+
+![1679037790663](image/README/1679037790663.png)
+
+### Module-4 Multi container Application
+
+Backend Dockerfile
+
+```
+FROM node
+
+WORKDIR /app
+
+COPY package.json .
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 80
+
+ENV MONGODB_USERNAME=root
+ENV MONGODB_PASSWORD=secret
+
+CMD ["npm", "start"]
+```
+
+Frontend Dockerfile
+
+```
+FROM node
+
+WORKDIR /app
+
+COPY package.json .
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+CMD [ "npm", "start" ]
+```
+
+![1679043458151](image/README/1679043458151.png)
+
+```
+docker run --name mongodb --rm -d -p 27017:27017 mongo
+```
+
+backend
+
+```
+docker build -t goals-node .
+```
+
+replace localhost to host.docker.internal
+
+```
+'mongodb://localhost:27017/db_name'
+to
+'mongodb://host.docker.internal:27017/db_name'
+```
+
+then
+
+```
+docker run --name goals-backend --rm -d -p 80:80 goals node
+```
+
+Frontend
+
+```
+docker build -t goals-react .
+docker run --name goals-frontend --rm -d -it -p 3000:3000 goals-react
+```
+
+##### Using Network
