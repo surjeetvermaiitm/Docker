@@ -755,3 +755,96 @@ frontend
 ### Module-5 Docker-compose
 
 ![1679050354545](image/README/1679050354545.png)
+
+![1679334670142](image/README/1679334670142.png)
+
+![1679334785217](image/README/1679334785217.png)
+
+Compose file
+docker-compose.yml
+
+```
+version: "3.8"
+services:
+  mongodb:
+    image: 'mongo'#named volumes
+    volumes:
+      - data:/data/db
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME: max
+    #   MONGO_INITDB_ROOT_PASSWORD: secret
+      # - MONGO_INITDB_ROOT_USERNAME=max
+    env_file:
+      - ./env/mongo.env
+  backend:
+    build: ./backend
+    # build:
+    #   context: ./backend
+    #   dockerfile: Dockerfile
+    #   args:
+    #     some-arg: 1
+    ports:
+      - '80:80'
+    volumes:
+      - logs:/app/logs #named volume
+      - ./backend:/app #bind mount volume
+      - /app/node_modules #anonymous volume
+    env_file:
+      - ./env/backend.env
+    depends_on:
+      - mongodb
+  frontend:
+    build: ./frontend
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend/src:/app/src
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend
+#named volume must be specified here
+volumes:
+  data:
+  logs:
+
+```
+
+mong.env inside env folder![1679335843409](image/README/1679335843409.png)
+
+to run docker compose file
+
+```
+docker-compose up -d
+```
+
+to stop/remove the container (-v for deleting the volume)
+
+```
+docker-compose down
+docker-compose down -v
+```
+
+backend.env inside env folder
+
+![1679337380385](image/README/1679337380385.png)
+
+### Module-6 Utility-container
+
+![1679421151203](image/README/1679421151203.png)
+
+```
+docker run -it node npm init
+docker run -it node npm install
+docker exec -it [container name] npm init
+```
+
+![1679422068183](image/README/1679422068183.png)
+
+![1679422397068](image/README/1679422397068.png)
+
+![1679422876148](image/README/1679422876148.png)![1679422929412](image/README/1679422929412.png)
+
+![1679423048051](image/README/1679423048051.png)
+
+### Module-8 Deploying Docker Container
