@@ -848,3 +848,59 @@ docker exec -it [container name] npm init
 ![1679423048051](image/README/1679423048051.png)
 
 ### Module-8 Deploying Docker Container
+
+![1679423626546](image/README/1679423626546.png)![1679423824734](image/README/1679423824734.png)
+
+![1679637304198](image/README/1679637304198.png)
+
+![1679637885045](image/README/1679637885045.png)
+
+![1679637980043](image/README/1679637980043.png)
+
+![1679639132663](image/README/1679639132663.png)
+
+command used on amazon-linux
+
+```
+sudo yum update -y
+sudo amazon-linux-extra install docker
+sudo service docker start
+docker run [container name]
+```
+
+Pushing local image to the cloud
+
+![1679641073364](image/README/1679641073364.png)
+use docker-hub
+
+![1679641127289](image/README/1679641127289.png)
+
+![1679641158913](image/README/1679641158913.png)
+
+![1679641229884](image/README/1679641229884.png)
+
+![1679641609178](image/README/1679641609178.png)
+
+![1679641698924](image/README/1679641698924.png)
+Login to docker in CLI
+
+```
+docker login
+```
+
+![1679641788818](image/README/1679641788818.png)
+Inside amazon linux ec2
+
+![1679718051128](image/README/1679718051128.png)
+
+Add inbound rules in security group
+for updating the code
+Rebuild image -> push to docker -> pull on ec2 -> re run the container
+
+Manual deployment to managed services
+
+![1679719555928](image/README/1679719555928.png)
+
+```
+
+```
